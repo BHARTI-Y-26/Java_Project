@@ -1,49 +1,92 @@
+ // Final ATM Project Code
+
 import java.util.Scanner;
 
-// Account Class (Encapsulation)
-class Account {
-    private double balance = 5000; // initial balance
+// Abstract Class (Abstraction)
+abstract class BankAccount {
+    protected double balance;
 
-    // Method to withdraw money
-    public void withdraw(double amount) {
-        if (amount <= 0) {
-            System.out.println("Invalid amount!");
-        } 
-        else if (amount > balance) {
-            System.out.println("Insufficient balance!");
-        } 
-        else {
-            balance -= amount;
-            System.out.println("Withdraw successful!");
+    // Constructor
+    public BankAccount(double balance) {
+        this.balance = balance;
+    }
+
+    // Abstract Method
+    public abstract void withdraw(double amount);
+
+    // Deposit Method
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Amount Deposited Successfully!");
+        } else {
+            System.out.println("Invalid Amount!");
         }
     }
 
-    // Method to check balance
-    public double getBalance() {
-        return balance;
+    // Check Balance
+    public void checkBalance() {
+        System.out.println("Current Balance: Rs. " + balance);
     }
 }
 
-// ATM Class
-class ATM {
-    static int PIN = 1234;
+// Savings Account Class (Inheritance)
+class SavingsAccount extends BankAccount {
 
-    // Method for authentication
-    public boolean authenticate(int userPin) {
-        return userPin == PIN;
+    public SavingsAccount(double balance) {
+        super(balance);
+    }
+
+    // Method Overriding (Polymorphism)
+    @Override
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            System.out.println("Invalid Amount!");
+        } 
+        else if (amount > balance) {
+            System.out.println("Insufficient Balance!");
+        } 
+        else {
+            balance -= amount;
+            System.out.println("Withdrawal Successful!");
+        }
+    }
+}
+
+// ATM Class (Encapsulation)
+class ATM {
+    private int pin;
+
+    // Constructor
+    public ATM(int pin) {
+        this.pin = pin;
+    }
+
+    // Authentication
+    public boolean authenticate(int enteredPin) {
+        return pin == enteredPin;
+    }
+
+    // Change PIN
+    public void changePin(int newPin) {
+        pin = newPin;
+        System.out.println("PIN Changed Successfully!");
     }
 }
 
 // Main Class
 public class ATMSimulation {
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
-        ATM atm = new ATM();
-        Account acc = new Account();
+
+        ATM atm = new ATM(1234);
+
+        // Runtime Polymorphism
+        BankAccount account = new SavingsAccount(5000);
 
         try {
-            // Step 1: PIN Authentication
-            System.out.print("Enter PIN: ");
+            System.out.print("Enter ATM PIN: ");
             int enteredPin = sc.nextInt();
 
             if (!atm.authenticate(enteredPin)) {
@@ -51,40 +94,55 @@ public class ATMSimulation {
                 return;
             }
 
-            // Step 2: Menu
             int choice;
+
             do {
                 System.out.println("\n===== ATM MENU =====");
                 System.out.println("1. Withdraw Money");
-                System.out.println("2. Check Balance");
-                System.out.println("3. Exit");
-                System.out.print("Enter choice: ");
-                
+                System.out.println("2. Deposit Money");
+                System.out.println("3. Check Balance");
+                System.out.println("4. Change PIN");
+                System.out.println("5. Exit");
+                System.out.print("Enter Choice: ");
+
                 choice = sc.nextInt();
 
                 switch (choice) {
+
                     case 1:
-                        System.out.print("Enter amount: ");
-                        double amount = sc.nextDouble();
-                        acc.withdraw(amount);
+                        System.out.print("Enter Amount to Withdraw: ");
+                        double withdrawAmount = sc.nextDouble();
+                        account.withdraw(withdrawAmount);
                         break;
 
                     case 2:
-                        System.out.println("Balance: " + acc.getBalance());
+                        System.out.print("Enter Amount to Deposit: ");
+                        double depositAmount = sc.nextDouble();
+                        account.deposit(depositAmount);
                         break;
 
                     case 3:
-                        System.out.println("Thank you!");
+                        account.checkBalance();
+                        break;
+
+                    case 4:
+                        System.out.print("Enter New PIN: ");
+                        int newPin = sc.nextInt();
+                        atm.changePin(newPin);
+                        break;
+
+                    case 5:
+                        System.out.println("Thank You for Using ATM!");
                         break;
 
                     default:
-                        System.out.println("Invalid choice!");
+                        System.out.println("Invalid Choice!");
                 }
 
-            } while (choice != 3);
+            } while (choice != 5);
 
         } catch (Exception e) {
-            System.out.println("Invalid input! Please enter numbers only.");
+            System.out.println("Invalid Input! Numbers Only.");
         }
 
         sc.close();
